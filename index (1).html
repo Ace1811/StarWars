@@ -1,0 +1,1177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Holocron Trivia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E6EBF1; --surface:#F7F9FC; --ink:#14213A; --muted:#55657C; --line:#C3CDDA;
+  --amber:#8F5C0C; --amber-soft:#F2E3C2; --ok:#2C7443; --bad:#B0412A; --sealed:#DCE3EC; --you:#2F5D9E;
+  --space:#0A1224; --space-ink:#EEE7D4; --space-muted:#A3B3C9; --gold:#F0C35A;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1A2B; --surface:#15253A; --ink:#EDE6D3; --muted:#93A4BA; --line:#2A3D57;
+    --amber:#E8B44A; --amber-soft:#3A3121; --ok:#86C795; --bad:#E57A63; --sealed:#1B2D45; --you:#7FB2F0;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1A2B; --surface:#15253A; --ink:#EDE6D3; --muted:#93A4BA; --line:#2A3D57;
+  --amber:#E8B44A; --amber-soft:#3A3121; --ok:#86C795; --bad:#E57A63; --sealed:#1B2D45; --you:#7FB2F0;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink); font:400 17px/1.55 "Bai Jamjuree","Segoe UI",system-ui,sans-serif}
+.wrap{max-width:640px; margin:0 auto; padding:28px 20px 120px}
+h1,h2,.display{font-family:"Michroma","Bai Jamjuree",system-ui,sans-serif; font-weight:400; letter-spacing:.02em}
+h1{font-size:1.05rem; margin:0; color:var(--amber)}
+header{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:28px; min-height:40px}
+h2{font-size:clamp(1.5rem,5vw,2.1rem); line-height:1.25; margin:0 0 12px}
+h3{font-size:1.05rem; margin:28px 0 10px; font-weight:600}
+p{margin:0 0 16px; max-width:62ch}
+.muted{color:var(--muted)}
+button{font:inherit; cursor:pointer}
+button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid var(--amber); outline-offset:2px}
+.btn{border:1px solid var(--amber); background:var(--amber); color:var(--bg); padding:12px 22px; border-radius:6px; font-weight:600}
+.btn.ghost{background:transparent; color:var(--ink); border-color:var(--line)}
+.btn.small{padding:7px 14px; font-size:.9rem; font-weight:500}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.hidden{display:none !important}
+.actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+
+/* Home */
+.modes{display:grid; gap:14px; margin-top:24px}
+.mode{
+  text-align:left; border:1px solid var(--line); background:var(--surface); color:var(--ink);
+  border-radius:10px; padding:20px 22px; display:block; width:100%;
+}
+.mode:hover{border-color:var(--amber)}
+.mode .display{display:block; font-size:1.05rem; margin-bottom:6px; color:var(--amber)}
+.mode span{color:var(--muted)}
+
+/* Difficulty */
+.tiers{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin:24px 0}
+.tier{position:relative; border:1px solid var(--line); border-radius:8px; padding:14px; background:var(--surface); cursor:pointer}
+.tier input{position:absolute; opacity:0; inset:0; cursor:pointer}
+.tier strong{display:block; font-weight:600}
+.tier span{font-size:.85rem; color:var(--muted)}
+.tier:has(input:checked){border-color:var(--amber); box-shadow:inset 0 0 0 1px var(--amber)}
+.best{font-size:.9rem; color:var(--muted); margin-top:18px}
+
+/* Game */
+.status{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; font-size:.95rem; color:var(--muted)}
+.status b{color:var(--ink); font-weight:600}
+.meter{display:flex; gap:5px; margin-bottom:22px}
+.meter i{flex:1; height:6px; border-radius:3px; background:var(--amber)}
+.meter i.spent{background:var(--line)}
+.ladder{list-style:none; margin:0 0 22px; padding:0; counter-reset:h}
+.ladder li{counter-increment:h; position:relative; padding:14px 16px 14px 58px; border-left:3px solid var(--line); min-height:54px}
+.ladder li::before{
+  content:counter(h); position:absolute; left:14px; top:12px; width:30px; height:30px; border-radius:50%;
+  display:grid; place-items:center; font-family:"Michroma",system-ui,sans-serif; font-size:.8rem;
+  border:1px solid var(--line); color:var(--muted);
+}
+.ladder li.open{border-left-color:var(--amber); background:var(--surface)}
+.ladder li.open::before{background:var(--amber); border-color:var(--amber); color:var(--bg)}
+.ladder li.open.fresh{animation:decode .5s ease-out}
+.ladder li.sealed{color:var(--muted); font-size:.9rem}
+.ladder li.sealed .bars{display:block; height:8px; margin-top:6px; width:70%; border-radius:4px;
+  background:repeating-linear-gradient(90deg,var(--sealed) 0 18px,transparent 18px 24px)}
+@keyframes decode{from{opacity:0; transform:translateX(-6px)}to{opacity:1; transform:none}}
+.guess{position:relative; display:flex; gap:8px}
+.guess input{flex:1; min-width:0; font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:12px 14px}
+.suggest{position:absolute; left:0; right:0; top:calc(100% + 4px); z-index:5; list-style:none; margin:0; padding:4px; max-height:240px; overflow:auto;
+  background:var(--surface); border:1px solid var(--line); border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.suggest li{padding:9px 10px; border-radius:4px; cursor:pointer}
+.suggest li[aria-selected="true"],.suggest li:hover{background:var(--amber-soft)}
+.suggest li small{color:var(--muted); margin-left:6px}
+.misses{display:flex; flex-wrap:wrap; gap:6px; margin-top:14px}
+.misses span{font-size:.85rem; color:var(--bad); border:1px solid var(--bad); border-radius:999px; padding:2px 10px; text-decoration:line-through}
+.flash{min-height:1.5em; margin-top:10px; font-size:.95rem; color:var(--bad)}
+.reveal{margin-top:24px; padding:18px; border-radius:8px; background:var(--surface); border:1px solid var(--line)}
+.reveal .who{font-family:"Michroma",system-ui,sans-serif; font-size:1.3rem; margin:4px 0 8px}
+.reveal.win{border-color:var(--ok)} .reveal.win .verdict{color:var(--ok)}
+.reveal.lose{border-color:var(--bad)} .reveal.lose .verdict{color:var(--bad)}
+.verdict{font-weight:600}
+.final{font-family:"Michroma",system-ui,sans-serif; font-size:clamp(3rem,14vw,5rem); line-height:1; color:var(--amber); margin:8px 0}
+.grid{font-size:1.6rem; letter-spacing:4px; margin:14px 0 6px}
+.legend{font-size:.85rem; color:var(--muted); margin-bottom:22px}
+.recap{list-style:none; padding:0; margin:0 0 26px; border-top:1px solid var(--line)}
+.recap li{display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid var(--line)}
+.recap li span:last-child{color:var(--muted); white-space:nowrap}
+
+/* Quiz */
+.qprog{height:4px; background:var(--line); border-radius:2px; margin-bottom:22px; overflow:hidden}
+.qprog i{display:block; height:100%; background:var(--amber); transition:width .25s}
+.answers{display:grid; gap:10px; margin-top:20px}
+.answer{text-align:left; padding:14px 18px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--ink)}
+.answer:hover{border-color:var(--amber)}
+.answer.picked{border-color:var(--amber); box-shadow:inset 0 0 0 1px var(--amber)}
+.match{padding:22px; border-radius:10px; border:1px solid var(--amber); background:var(--surface)}
+.match .who{font-family:"Michroma",system-ui,sans-serif; font-size:clamp(1.4rem,6vw,2rem); line-height:1.2; margin:6px 0 10px}
+.match .pct{color:var(--amber); font-weight:600}
+.traits{margin-top:8px}
+.trait{margin:14px 0}
+.trait .ends{display:flex; justify-content:space-between; font-size:.85rem; color:var(--muted); margin-bottom:6px}
+.track{position:relative; height:6px; border-radius:3px; background:var(--line)}
+.dot{position:absolute; top:50%; width:14px; height:14px; border-radius:50%; transform:translate(-50%,-50%); border:2px solid var(--bg)}
+.dot.you{background:var(--you)} .dot.them{background:var(--amber)}
+.key{display:flex; gap:18px; font-size:.85rem; color:var(--muted); margin-top:6px}
+.key b{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0}
+.close{list-style:none; padding:0; margin:0; border-top:1px solid var(--line)}
+.close li{display:flex; justify-content:space-between; gap:14px; padding:12px 0; border-bottom:1px solid var(--line)}
+.close li div small{display:block; color:var(--muted); font-size:.88rem}
+.close li > span{color:var(--amber); font-weight:600; white-space:nowrap}
+
+/* Tell me the odds */
+.odds-q{margin-bottom:6px}
+.nums{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:22px 0 4px}
+.num{padding:14px 0; border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:8px; font-family:"Michroma",system-ui,sans-serif; font-size:1.1rem}
+.num:hover:not(:disabled){border-color:var(--amber)}
+.num:disabled{cursor:default}
+.num.right{background:var(--ok); border-color:var(--ok); color:var(--bg)}
+.num.wrong{border-color:var(--bad); color:var(--bad); text-decoration:line-through}
+.eps{display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 8px}
+.ep{min-width:40px; text-align:center; padding:5px 6px; border-radius:6px; border:1px solid var(--line); color:var(--muted); font-size:.85rem}
+.ep.on{background:var(--amber); border-color:var(--amber); color:var(--bg); font-weight:600}
+.reveal.near{border-color:var(--amber)} .reveal.near .verdict{color:var(--amber)}
+
+/* Shiny Han button */
+.han-wrap{position:relative; margin-top:34px; padding:4px}
+.han-wrap .glit{position:absolute; width:var(--s,10px); height:var(--s,10px); background:var(--gold); opacity:0; pointer-events:none;
+  clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);
+  animation:glint var(--d,4s) ease-in-out infinite; animation-delay:var(--w,0s)}
+.mode.shine{position:relative; overflow:hidden; isolation:isolate; background:var(--space); border-color:var(--gold); color:var(--space-ink);
+  box-shadow:0 0 0 1px rgba(240,195,90,.35), 0 0 26px rgba(240,195,90,.28)}
+.mode.shine .display{color:var(--gold)}
+.mode.shine span.sub{color:var(--space-muted)}
+.mode.shine i{position:absolute; z-index:-1; border-radius:50%; background:#fff; animation:twinkle var(--d,3s) ease-in-out infinite; animation-delay:var(--w,0s)}
+.mode.shine::after{content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(110deg, transparent 30%, rgba(255,236,170,.35) 48%, transparent 66%);
+  transform:translateX(-100%); animation:sheen 3.8s ease-in-out infinite}
+@keyframes sheen{0%,55%{transform:translateX(-100%)}85%,100%{transform:translateX(100%)}}
+@media (prefers-reduced-motion:reduce){.mode.shine::after,.han-wrap .glit,.mode.shine i{animation:none} .han-wrap .glit{opacity:.8}}
+
+/* Han Solo files */
+.space{position:relative; overflow:hidden; isolation:isolate; border-radius:14px; background:var(--space); color:var(--space-ink); padding:28px 22px 18px}
+.space h2{color:var(--gold)}
+.space p{color:var(--space-ink)}
+.space .soft{color:var(--space-muted); font-size:.9rem; margin:0 0 4px}
+.sky{position:absolute; inset:0; z-index:-1; pointer-events:none}
+.sky i{position:absolute; border-radius:50%; background:#fff; opacity:.6; animation:twinkle var(--d,3s) ease-in-out infinite; animation-delay:var(--w,0s)}
+.sky b{position:absolute; width:var(--s,10px); height:var(--s,10px); background:var(--gold); opacity:0;
+  clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);
+  animation:glint var(--d,4s) ease-in-out infinite; animation-delay:var(--w,0s)}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:1}}
+@keyframes glint{0%,100%{opacity:0; transform:scale(.3) rotate(0deg)}50%{opacity:.95; transform:scale(1) rotate(45deg)}}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin:18px 0}
+.chip{border:1px solid rgba(240,195,90,.45); background:transparent; color:var(--space-ink); padding:6px 14px; border-radius:999px; font-size:.9rem}
+.chip[aria-pressed="true"]{background:var(--gold); color:var(--space); border-color:var(--gold)}
+.btn.gold{background:var(--gold); border-color:var(--gold); color:var(--space)}
+.facts{list-style:none; margin:10px 0 0; padding:0}
+.facts li{padding:14px 10px; margin:0 -10px; border-top:1px solid rgba(238,231,212,.14); border-radius:6px}
+.facts li .src{display:block; font-size:.78rem; color:var(--gold); margin-bottom:3px}
+.facts li.lit{background:rgba(240,195,90,.14); border-top-color:transparent}
+.facts li.special{position:relative; overflow:hidden; margin:14px -10px 4px; padding:18px 16px 16px; border:1px solid var(--gold); border-radius:10px;
+  background:linear-gradient(135deg, rgba(240,195,90,.18), rgba(240,195,90,.04) 45%, rgba(255,255,255,.07) 70%, rgba(240,195,90,.14));
+  box-shadow:0 0 26px rgba(240,195,90,.25)}
+.facts li.special.lit{border-top-color:var(--gold); box-shadow:0 0 34px rgba(240,195,90,.45)}
+.facts li.special::after{content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(110deg, transparent 30%, rgba(255,236,170,.28) 48%, transparent 66%);
+  transform:translateX(-100%); animation:sheen 4.5s ease-in-out infinite}
+.special .big{display:flex; align-items:center; gap:16px; margin:2px 0 10px}
+.special .n27{font-family:"Michroma",system-ui,sans-serif; font-size:3rem; line-height:1; color:var(--gold); text-shadow:0 0 18px rgba(240,195,90,.55)}
+.dice{display:flex; gap:7px}
+.die{width:24px; height:24px; padding:3px; border:1.5px solid var(--gold); border-radius:5px; display:grid; grid-template:repeat(3,1fr)/repeat(3,1fr); transform:rotate(-9deg)}
+.die + .die{transform:rotate(11deg) translateY(4px)}
+.die s{width:4px; height:4px; border-radius:50%; background:var(--gold); place-self:center}
+@media (prefers-reduced-motion:reduce){.sky i,.sky b{animation:none} .sky b{opacity:.7} .facts li.special::after{animation:none; opacity:0}}
+
+/* Music player */
+.player{position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; justify-content:center;
+  padding:0 12px calc(12px + env(safe-area-inset-bottom,0px)); pointer-events:none}
+.player .bar{pointer-events:auto; display:flex; align-items:center; gap:6px; width:100%; max-width:520px;
+  background:var(--space); color:var(--space-ink); border:1px solid rgba(240,195,90,.4); border-radius:999px;
+  padding:6px 16px 6px 6px; box-shadow:0 8px 28px rgba(0,0,0,.28)}
+.pbtn{flex:none; width:38px; height:38px; border-radius:50%; border:none; background:transparent; color:var(--space-ink); display:grid; place-items:center; padding:0}
+.pbtn:hover{background:rgba(238,231,212,.1)}
+.pbtn.play{background:var(--gold); color:var(--space)}
+.pinfo{flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.25; margin-left:6px}
+.pinfo .pt{font-size:.9rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.pinfo .ps{font-size:.75rem; color:var(--space-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+#mVol{flex:none; width:86px; accent-color:var(--gold)}
+@media (max-width:420px){#mVol{display:none}}
+
+footer{margin-top:48px; font-size:.8rem; color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.ladder li.open.fresh{animation:none} .qprog i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Holocron Trivia</h1>
+    <button class="btn ghost small hidden" id="backBtn">Back to start</button>
+  </header>
+
+  <!-- HOME -->
+  <section id="home">
+    <h2>Open the holocron</h2>
+    <p>Test what you know about the galaxy’s deep cuts, or find out which of its residents you’re most like.</p>
+    <div class="modes">
+      <button class="mode" id="goGuess"><span class="display">Guess the character</span><span>Name them from five hints, each one easier than the last.</span></button>
+      <button class="mode" id="goQuiz"><span class="display">Which character are you?</span><span>Fifteen questions, matched against more than 100 characters.</span></button>
+      <button class="mode" id="goOdds"><span class="display">Tell me the odds</span><span>Guess how many of the nine saga films something shows up in.</span></button>
+    </div>
+    <div class="han-wrap" id="hanWrap">
+      <button class="mode shine" id="goHan"><span class="display">The Han Solo files</span><span class="sub">The most obscure facts about Han from the films, comics, early drafts and Legends.</span></button>
+    </div>
+  </section>
+
+  <!-- GUESS: SETUP -->
+  <section id="setup" class="hidden">
+    <h2>Guess the character</h2>
+    <p>Each character starts with their most obscure clue. Every wrong guess or extra hint unseals an easier one, so the earlier you name them, the more points you keep.</p>
+    <p class="muted">Ten characters per run. Up to 5 points each.</p>
+    <div class="tiers" role="radiogroup" aria-label="Difficulty">
+      <label class="tier"><input type="radio" name="tier" value="1"><strong>Casual</strong><span>Saga regulars</span></label>
+      <label class="tier"><input type="radio" name="tier" value="2" checked><strong>Fan</strong><span>Animated series, Rogue One, Andor</span></label>
+      <label class="tier"><input type="radio" name="tier" value="3"><strong>Deep cut</strong><span>Background legends and Legends</span></label>
+      <label class="tier"><input type="radio" name="tier" value="0"><strong>Mixed</strong><span>Everything, shuffled</span></label>
+    </div>
+    <button class="btn" id="startBtn">Start the run</button>
+    <div class="best" id="bestLine"></div>
+  </section>
+
+  <!-- GUESS: GAME -->
+  <section id="game" class="hidden" aria-live="polite">
+    <div class="status">
+      <span>Character <b id="roundNum">1</b> of 10</span>
+      <span>Score <b id="scoreNum">0</b></span>
+    </div>
+    <div class="meter" id="meter" aria-label="Points still available"></div>
+    <ol class="ladder" id="ladder"></ol>
+    <div id="guessArea">
+      <div class="guess">
+        <input id="guessInput" type="text" autocomplete="off" spellcheck="false" placeholder="Type a name…" aria-label="Your guess" aria-autocomplete="list" aria-controls="suggest">
+        <button class="btn" id="guessBtn">Guess</button>
+        <ul class="suggest hidden" id="suggest" role="listbox"></ul>
+      </div>
+      <div class="actions">
+        <button class="btn ghost" id="hintBtn">Unseal next hint</button>
+        <button class="btn ghost" id="giveBtn">Give up</button>
+      </div>
+      <div class="flash" id="flash"></div>
+      <div class="misses" id="misses"></div>
+    </div>
+    <div class="reveal hidden" id="reveal">
+      <div class="verdict" id="verdict"></div>
+      <div class="who" id="who"></div>
+      <div class="muted" id="whoNote"></div>
+      <div class="actions"><button class="btn" id="nextBtn">Next character</button></div>
+    </div>
+  </section>
+
+  <!-- GUESS: END -->
+  <section id="end" class="hidden">
+    <h2>Run complete</h2>
+    <div class="final" id="finalScore">0</div>
+    <p class="muted" id="finalNote"></p>
+    <div class="grid" id="grid"></div>
+    <div class="legend">🟩 hint 1 · 🟨 hint 2 · 🟧 hint 3 · 🟥 hint 4 · 🟪 hint 5 · ⬛ missed</div>
+    <ol class="recap" id="recap"></ol>
+    <div class="actions">
+      <button class="btn" id="againBtn">Play another run</button>
+      <button class="btn ghost" id="shareBtn">Copy result</button>
+      <button class="btn ghost" id="menuBtn">Change difficulty</button>
+    </div>
+    <div class="flash" id="shareFlash" style="color:var(--ok)"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="hidden">
+    <div class="status"><span>Question <b id="qNum">1</b> of <span id="qTotal">12</span></span>
+      <button class="btn ghost small" id="qPrev">Previous question</button></div>
+    <div class="qprog"><i id="qBar" style="width:0"></i></div>
+    <h2 id="qText"></h2>
+    <div class="answers" id="answers"></div>
+  </section>
+
+  <!-- QUIZ RESULT -->
+  <section id="qresult" class="hidden">
+    <div class="match">
+      <div class="muted">You’re most like</div>
+      <div class="who" id="mName"></div>
+      <p id="mBlurb" style="margin-bottom:8px"></p>
+      <div class="pct" id="mPct"></div>
+    </div>
+    <h3>How you compare</h3>
+    <div class="key"><span><b style="background:var(--you)"></b>You</span><span><b style="background:var(--amber)"></b><span id="keyName">Them</span></span></div>
+    <div class="traits" id="traits"></div>
+    <h3>Also a close match</h3>
+    <ol class="close" id="closeList"></ol>
+    <div class="actions" style="margin-top:22px">
+      <button class="btn" id="retakeBtn">Retake the quiz</button>
+      <button class="btn ghost" id="qShareBtn">Copy result</button>
+    </div>
+    <div class="flash" id="qShareFlash" style="color:var(--ok)"></div>
+  </section>
+
+  <!-- TELL ME THE ODDS -->
+  <section id="odds" class="hidden" aria-live="polite">
+    <div class="status">
+      <span>Prompt <b id="oNum">1</b> of 10</span>
+      <span>Score <b id="oScore">0</b></span>
+    </div>
+    <p class="muted odds-q">In how many of the nine Skywalker Saga films does this happen?</p>
+    <h2 id="oPrompt"></h2>
+    <div class="nums" id="oNums" role="group" aria-label="Number of films"></div>
+    <p class="muted" style="font-size:.85rem; margin-top:8px">Exact answer: 3 points. Off by one: 1 point. Current versions of each film count.</p>
+    <div class="reveal hidden" id="oReveal">
+      <div class="verdict" id="oVerdict"></div>
+      <div class="eps" id="oEps"></div>
+      <div class="muted" id="oNote"></div>
+      <div class="actions"><button class="btn" id="oNext">Next prompt</button></div>
+    </div>
+  </section>
+
+  <section id="oddsEnd" class="hidden">
+    <h2>The odds are in</h2>
+    <div class="final" id="oFinal">0</div>
+    <p class="muted" id="oFinalNote"></p>
+    <div class="grid" id="oGrid"></div>
+    <div class="legend">🎯 exact · 🟡 off by one · ⚫ missed</div>
+    <ol class="recap" id="oRecap"></ol>
+    <div class="actions">
+      <button class="btn" id="oAgain">Play another round</button>
+      <button class="btn ghost" id="oShare">Copy result</button>
+    </div>
+    <div class="flash" id="oShareFlash" style="color:var(--ok)"></div>
+  </section>
+
+  <!-- HAN SOLO FILES -->
+  <section id="han" class="hidden">
+    <div class="space">
+      <div class="sky" id="sky" aria-hidden="true"></div>
+      <h2>The Han Solo files</h2>
+      <p>The deepest cuts about the galaxy’s favorite scoundrel, from rough drafts and comics to the Legends novels most fans never read.</p>
+      <div class="chips" id="hanChips" role="group" aria-label="Filter facts by source"></div>
+      <p class="soft" id="hanCount"></p>
+      <ul class="facts" id="hanFacts"></ul>
+    </div>
+  </section>
+
+  <footer>Unofficial fan project. Not affiliated with or endorsed by Lucasfilm or Disney. Background music is original and generated in your browser.</footer>
+
+  <div class="player" role="region" aria-label="Background music">
+    <div class="bar">
+      <button class="pbtn play" id="mPlay" aria-label="Play music"></button>
+      <button class="pbtn" id="mPrev" aria-label="Previous track"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z" fill="currentColor"/></svg></button>
+      <button class="pbtn" id="mNext" aria-label="Next track"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z" fill="currentColor"/></svg></button>
+      <div class="pinfo"><span class="pt" id="mTitle"></span><span class="ps" id="mSub"></span></div>
+      <input type="range" id="mVol" min="0" max="100" aria-label="Music volume">
+    </div>
+  </div>
+</div>
+<script>
+const DATA = [
+// Casual
+["Grand Moff Tarkin",["Tarkin","Wilhuff Tarkin"],1,["Was raised on Eriadu and put through his family’s brutal survival trials on the Carrion Plateau.","Argued that fear of force, not force itself, should keep systems in line.","As a Republic officer during the Clone Wars, pushed for Ahsoka Tano to face a military tribunal.","Ordered the destruction of Alderaan.","Commanded the first Death Star at Yavin."]],
+["Grogu",["Baby Yoda","The Child","Din Grogu"],1,["Escaped the purge of the Jedi Temple thanks to Jedi Master Kelleran Beq.","Imperial scientists wanted samples of his blood.","Trained for a time with Luke Skywalker before choosing a different path.","Became a Mandalorian foundling and later an apprentice.","The small green child Din Djarin protects."]],
+["General Grievous",["Grievous","Qymaen jai Sheelal"],1,["Was once a Kaleesh warlord before his body was rebuilt.","Collected the lightsabers of the Jedi he defeated.","Never stops coughing.","His arms split apart so he can wield four blades at once.","Cyborg Separatist commander Obi-Wan fights on Utapau."]],
+["Jyn Erso",["Jyn","Liana Hallik"],1,["Used aliases such as Liana Hallik.","Was raised in part by Saw Gerrera’s partisans.","Her father deliberately built a flaw into a superweapon.","Was broken out of an Imperial labor camp by the Rebellion.","Leads the mission to steal the Death Star plans on Scarif."]],
+["Ahsoka Tano",["Ahsoka","Snips","Fulcrum"],1,["Once worked as a rebel intelligence contact under the codename Fulcrum.","Walked away from the Jedi Order after being falsely accused of a bombing.","A Togruta with white facial markings.","Was Anakin Skywalker’s Padawan.","Fights with two white lightsabers."]],
+["Cassian Andor",["Cassian","Kassa"],1,["Was born on Kenari under another name.","Was recruited into the rebellion by Luthen Rael.","Escaped from the Narkina 5 prison.","Works alongside the reprogrammed droid K-2SO.","Rebel intelligence officer who dies on Scarif."]],
+["Lando Calrissian",["Lando"],1,["Lost his ship to a friend in a game of sabacc.","Owns a closet full of capes.","Became administrator of a gas-mining colony.","Flew the Millennium Falcon into the second Death Star.","Han Solo’s old friend who runs Cloud City."]],
+["Boba Fett",["Boba"],1,["Was an unaltered clone raised as a son.","Survived being swallowed by a sarlacc.","Delivered a smuggler frozen in carbonite to Jabba.","Later ruled Jabba’s old territory as daimyo.","Armored bounty hunter, son of Jango."]],
+["Padmé Amidala",["Padme","Padmé","Padme Amidala","Queen Amidala","Amidala"],1,["Used her handmaiden Sabé as a decoy.","Was elected to rule her planet at fourteen.","Later represented Naboo in the Galactic Senate.","Secretly married a Jedi.","Mother of Luke and Leia."]],
+["Qui-Gon Jinn",["Qui-Gon","Qui Gon","Quigon"],1,["Learned how to keep his identity after death.","Was trained by Count Dooku.","Defied the Jedi Council more than once.","Discovered a gifted slave boy on Tatooine.","Obi-Wan’s master, killed by Darth Maul."]],
+["Mace Windu",["Mace","Windu"],1,["Created the aggressive lightsaber form Vaapad.","Senior member of the Jedi High Council.","Beheaded Jango Fett on Geonosis.","Carries a purple lightsaber.","Tried to arrest Palpatine and was betrayed by Anakin."]],
+["Count Dooku",["Dooku","Darth Tyranus","Tyranus"],1,["Was born into nobility on Serenno.","Trained Qui-Gon Jinn.","Led the Separatist movement.","Uses a lightsaber with a curved hilt.","Sith Lord also known as Darth Tyranus."]],
+["Chewbacca",["Chewie"],1,["Fought beside Yoda at the Battle of Kashyyyk.","Is over two hundred years old by the original trilogy.","Owes a life debt to a smuggler.","Fires a bowcaster.","Han Solo’s Wookiee co-pilot."]],
+["Han Solo",["Han","Solo"],1,["Got his surname from an Imperial recruitment officer.","Once fought in the mud on Mimban as an Imperial infantry soldier.","Owed a large debt to Jabba the Hutt.","Was frozen in carbonite on Cloud City.","Corellian smuggler who captains the Millennium Falcon."]],
+["Luke Skywalker",["Luke"],1,["Flew as Red Five.","Trained with a tiny Jedi Master on a swamp planet.","Lost a hand in a duel on Cloud City.","Fired the shot that destroyed the first Death Star.","Tatooine farm boy who learns Darth Vader is his father."]],
+["Leia Organa",["Leia","Princess Leia","General Leia"],1,["Was raised by Bail and Breha Organa.","Hid stolen plans inside an astromech droid.","Strangled a crime lord with the chain he kept her on.","Princess of Alderaan.","Rebel leader and Luke’s twin sister."]],
+["Darth Vader",["Vader","Anakin Skywalker","Anakin","Ani"],1,["His mother said he had no father.","Won a podrace as a boy.","Was badly burned on Mustafar.","Breathes through a life-support suit.","Sith Lord who turns out to be Luke’s father."]],
+["Yoda",["Master Yoda"],1,["Lived to be about 900 years old.","Dueled Palpatine inside the Senate chamber.","Went into exile on Dagobah.","Speaks with his sentences rearranged.","Small green Jedi Grand Master."]],
+["Obi-Wan Kenobi",["Obi-Wan","Obi Wan","Obiwan","Ben Kenobi","Ben","Kenobi"],1,["Defeated Darth Maul right after his own master fell.","Discovered a secret clone army on Kamino.","Hid on Tatooine under the name Ben.","Trained Anakin Skywalker.","Jedi Master struck down by Vader on the first Death Star."]],
+["Palpatine",["Darth Sidious","Sidious","The Emperor","Emperor Palpatine","Sheev Palpatine","Emperor"],1,["Started his career as a senator from Naboo.","Was apprenticed to Darth Plagueis.","Became Supreme Chancellor of the Republic.","Declared himself Emperor.","Sith Lord who shoots lightning from his fingers."]],
+["R2-D2",["R2","Artoo","R2D2"],1,["Repaired a royal starship’s shields while under fire.","Carried a hidden holographic message across a desert.","Can fly with rocket boosters in the prequels.","Speaks only in beeps and whistles.","Blue and white astromech droid."]],
+["C-3PO",["Threepio","3PO","C3PO","See-Threepio"],1,["Was built by a young boy on Tatooine.","Fluent in over six million forms of communication.","Was mistaken for a god by Ewoks.","Anxious, fussy, and always worried about the odds.","Golden protocol droid."]],
+["Darth Maul",["Maul"],1,["Was born on Dathomir.","Survived being cut in half.","Later ran the Crimson Dawn crime syndicate.","A red-and-black tattooed Zabrak.","Sith with a double-bladed red lightsaber in The Phantom Menace."]],
+["Jar Jar Binks",["Jar Jar","JarJar"],1,["Was banished from Otoh Gunga.","Proposed emergency powers for the Chancellor in the Senate.","Became a general in the Gungan army.","A Gungan with long floppy ears.","Clumsy Gungan who befriends Qui-Gon."]],
+["Greedo",[],1,["A Rodian.","Worked as a bounty hunter for Jabba.","Cornered a smuggler at a cantina table.","Fans still argue about who fired first.","Green bounty hunter Han shoots in the Mos Eisley cantina."]],
+["Wicket",["Wicket W. Warrick","Wicket Warrick"],1,["Played by Warwick Davis, who was only 11 at the time.","Found a princess knocked out in the forest.","Wears an orange hood.","Lives in a treetop village on Endor.","The Ewok who befriends Leia."]],
+["Owen Lars",["Owen","Uncle Owen"],1,["His father married a freed slave named Shmi.","Met his future stepbrother on Tatooine during the Clone Wars.","Took in a baby boy and raised him as his own.","Runs a moisture farm.","Luke’s uncle on Tatooine."]],
+["Moff Gideon",["Gideon"],1,["Was once an officer of the Imperial Security Bureau.","Carried the Darksaber.","Hunted Grogu for his blood.","Commands what’s left of the Empire after its fall.","Villain of The Mandalorian, played by Giancarlo Esposito."]],
+["Din Djarin",["Mando","The Mandalorian","Mandalorian","Djarin"],1,["Was a foundling rescued during a droid attack.","Wielded the Darksaber for a time.","Swore never to remove his helmet in front of others.","A bounty hunter protecting Grogu.","Title character of The Mandalorian."]],
+["Jabba the Hutt",["Jabba"],1,["Watched the Boonta Eve podrace.","Kept a rancor under his throne room.","Hung a frozen smuggler on his wall.","Was strangled by Leia.","Giant slug-like crime lord of Tatooine."]],
+["Jango Fett",["Jango"],1,["Was the template for a clone army.","Asked for one unaltered clone as part of his payment.","Lived on Kamino.","Was killed by Mace Windu on Geonosis.","Boba Fett’s father."]],
+["Bo-Katan Kryze",["Bo-Katan","Bo Katan","Bokatan"],1,["Her sister was a famous pacifist duchess.","Was once a member of Death Watch.","Led Mandalorians during the Siege of Mandalore.","Wanted the Darksaber to reclaim her planet.","Mandalorian leader who teams up with Din Djarin."]],
+// Fan
+["Admiral Ackbar",["Ackbar","Gial Ackbar"],2,["Served as captain of a king’s guard during the Clone Wars.","Comes from an ocean world known for its shipyards.","Commanded from the flagship Home One.","Directed the Rebel fleet at the Battle of Endor.","Mon Calamari admiral who realized Endor was an ambush."]],
+["Bib Fortuna",["Bib"],2,["Later sat on a throne in Mos Espa until he was overthrown.","A Twi’lek.","Served as majordomo to a Hutt crime lord.","Greeted visitors at the gate of a desert palace.","Jabba’s head-tailed majordomo in Return of the Jedi."]],
+["Dexter Jettster",["Dexter","Dex"],2,["Recognized a weapon that came from a distant cloning world.","A Besalisk.","Has four arms and a fleshy crest on his head.","Runs a diner on Coruscant.","Obi-Wan’s old friend who identifies the Kamino saberdart."]],
+["Thrawn",["Grand Admiral Thrawn","Mitth'raw'nuruodo","Mitthrawnuruodo"],2,["Studies a culture’s art to predict how its people will fight.","A Chiss.","Has blue skin and glowing red eyes.","First appeared in Timothy Zahn’s novels, later in Rebels and Ahsoka.","Imperial Grand Admiral famed as a tactical genius."]],
+["Hondo Ohnaka",["Hondo"],2,["Once held a Sith Lord and two Jedi for ransom at the same time.","A Weequay.","Runs a pirate gang out of Florrum.","Turns up in The Clone Wars, Rebels, and at Galaxy’s Edge.","Charming, self-serving pirate in goggles."]],
+["Cad Bane",["Bane"],2,["Once took senators hostage inside the Senate building.","A Duros.","Has breathing tubes on his cheeks.","Wears a wide-brimmed hat.","Bounty hunter who faces Boba Fett in a Tatooine showdown."]],
+["K-2SO",["K2SO","K2","Kay-Tu","Kaytoo","K-2"],2,["A KX-series security model.","Was reprogrammed for the Rebellion.","Always tells you the odds, bluntly.","Partnered with Cassian Andor.","Tall, sarcastic former Imperial droid in Rogue One."]],
+["Saw Gerrera",["Saw"],2,["Fought the Separatists on Onderon.","Lost his sister Steela in battle.","His tactics were too extreme even for the Rebellion.","Raised Jyn Erso for a time.","Partisan leader hiding out on Jedha."]],
+["Kanan Jarrus",["Kanan","Caleb Dume"],2,["Survived Order 66 as a Padawan.","Hid his past by living as a drifter and gunslinger.","Was blinded by Maul.","Trained Ezra Bridger.","Jedi of the Ghost crew who sacrificed himself on Lothal."]],
+["Ezra Bridger",["Ezra"],2,["Grew up alone on the streets of Lothal.","Has an unusual bond with animals.","Built a lightsaber that doubles as a blaster.","Was trained by Kanan Jarrus.","Vanished into deep space along with Thrawn."]],
+["Hera Syndulla",["Hera"],2,["Her father Cham led a resistance movement on Ryloth.","A Twi’lek.","Later became a general in the New Republic.","Mother of Jacen.","Pilot and captain of the Ghost."]],
+["Chopper",["C1-10P","Chop"],2,["His arms don’t match because he’s been patched up so often.","Has a habit of zapping people.","An astromech with a famously bad attitude.","Belongs to Hera Syndulla.","Grumpy droid of the Ghost crew."]],
+["Asajj Ventress",["Ventress","Asajj"],2,["Was taken from Dathomir as a child and raised by a Jedi.","Joined the Nightsisters.","Was Count Dooku’s secret apprentice.","Pale and bald, with twin curved red lightsabers.","Later became a bounty hunter allied with Quinlan Vos."]],
+["Plo Koon",["Plo"],2,["Found Ahsoka Tano when she was a child.","A Kel Dor who wears a mask outside his home atmosphere.","Led a clone squadron called the Wolfpack.","Jedi Council member and skilled pilot.","Shot down in his starfighter during Order 66."]],
+["Kit Fisto",["Kit"],2,["Can breathe underwater.","A Nautolan.","Has long head tentacles.","Almost always smiling.","Killed by Palpatine alongside Mace Windu."]],
+["Ki-Adi-Mundi",["Mundi","Ki Adi Mundi","Kiadimundi"],2,["Has a binary brain.","A Cerean.","His species has so few males that he took several wives.","Has a tall, conical head.","Jedi Master gunned down by clones on Mygeeto."]],
+["Sabine Wren",["Sabine"],2,["Comes from Clan Wren of Krownest.","Designed a weapon while at an Imperial academy.","Paints her armor and leaves graffiti behind.","The Ghost crew’s explosives expert.","Mandalorian artist from Rebels."]],
+["Wedge Antilles",["Wedge"],2,["Was briefly a cadet at an Imperial flight academy.","A Corellian.","Flew against both Death Stars and lived.","Flew as Red Two at Yavin.","X-wing pilot who led the run into the second Death Star."]],
+["Nien Nunb",["Nien"],2,["Was a smuggler before joining the Rebellion.","A Sullustan.","His lines are spoken in Haya, a real language from Tanzania.","Has prominent jowls.","Lando’s co-pilot on the Falcon at Endor."]],
+["Orson Krennic",["Krennic","Director Krennic"],2,["Met Galen Erso in a Republic program for gifted students.","Director of Advanced Weapons Research.","Oversaw construction of the Death Star.","Wears a white cape.","Rogue One villain caught in his own weapon’s blast."]],
+["Luthen Rael",["Luthen","Axis"],2,["Flies a ship packed with hidden weapons.","Runs an antiquities gallery on Coruscant as cover.","Recruits Cassian Andor.","Rebel spymaster the ISB knows only as Axis.","Andor’s spymaster played by Stellan Skarsgård."]],
+["Greef Karga",["Greef","Karga"],2,["Runs a bounty hunters’ guild.","Became magistrate of Nevarro.","Was healed by Grogu.","Played by Carl Weathers.","Hands Din Djarin his bounties."]],
+["Watto",[],2,["A Toydarian.","Jedi mind tricks don’t work on him.","Owned Anakin and Shmi Skywalker.","Runs a junk shop in Mos Espa.","Winged junk dealer who bet against Anakin."]],
+["Sebulba",[],2,["A Dug.","Walks on his hands.","Flies a huge orange podracer.","Cheats during the Boonta Eve race.","Anakin’s podracing rival."]],
+["Fennec Shand",["Fennec"],2,["An elite mercenary and assassin.","Was left for dead on Tatooine.","Was rebuilt with cybernetics.","Played by Ming-Na Wen.","Boba Fett’s right hand."]],
+["Captain Rex",["Rex","CT-7567"],2,["Tallies his kills on his helmet.","Removed his inhibitor chip.","Leader of the 501st Legion’s clones.","A close friend of Ahsoka.","Clone captain with blue markings who served under Anakin."]],
+["Mon Mothma",["Mothma"],2,["Represented Chandrila in the Senate.","Arranged her daughter’s marriage to protect a secret cause.","Co-founded the Rebel Alliance.","Briefed the fleet before the Battle of Endor.","Rebel leader at the center of Andor."]],
+// Deep cut
+["Teebo",[],3,["Wears a horned skull headdress and is a budding shaman.","Has gray, striped fur.","Helped capture a group of rebels in a net trap.","Lives in a treetop village on a forest moon.","An Ewok, but not Wicket."]],
+["Yarael Poof",["Yarael","Poof"],3,["His species is related to the four-armed Xexto.","A Quermian.","Sat on the Jedi High Council during The Phantom Menace.","His extremely long neck makes him tower over the Council.","Jedi Master whose surname sounds like a magic trick."]],
+["Mara Jade",["Mara","Mara Jade Skywalker"],3,["Created by Timothy Zahn in 1991.","Served as one of the Emperor’s Hands.","Later became a Jedi Master.","Red-haired former Imperial agent.","Married Luke Skywalker in Legends."]],
+["Doctor Aphra",["Aphra","Chelli Aphra","Chelli Lona Aphra","Dr. Aphra"],3,["An archaeologist who sells illicit artifacts.","Travels with two murderous droids.","Worked for Darth Vader.","Debuted in Marvel’s Darth Vader comic in 2015.","Rogue archaeologist with her own Marvel series."]],
+["Savage Opress",["Savage"],3,["Was a Nightbrother.","Was transformed by Mother Talzin’s magic.","A horned Zabrak with yellow and black tattoos.","Was killed by Darth Sidious.","Darth Maul’s brother."]],
+["Shaak Ti",["Shaak"],3,["Oversaw clone training on Kamino.","A Togruta.","Sat on the Jedi High Council.","Has red skin and blue-and-white striped montrals.","Togruta Jedi Master from the prequel era."]],
+["Momaw Nadon",["Hammerhead","Momaw"],3,["An Ithorian.","His species sees itself as caretakers of forests.","His original Kenner action figure was sold simply as Hammerhead.","Sat in the Mos Eisley cantina.","The hammer-headed alien in the cantina."]],
+["Lobot",[],3,["Wears a cybernetic implant wrapped around his head.","Works as an aide to a colony administrator.","Bald, with a computer headband.","Never says a word in The Empire Strikes Back.","Lando’s cyborg aide on Cloud City."]],
+["Salacious B. Crumb",["Salacious Crumb","Crumb","Salacious"],3,["Got his job by making his boss laugh.","A Kowakian monkey-lizard.","Perches beside a throne.","Known for his cackling.","Jabba’s jester."]],
+["Max Rebo",["Rebo"],3,["An Ortolan.","Agreed to be paid in food.","Plays a red ball jett organ.","His band plays at Jabba’s palace.","Blue keyboardist who leads his own band."]],
+["Biggs Darklighter",["Biggs"],3,["Grew up on Tatooine.","Graduated from the Imperial academy and then defected.","Flew as Red Three at Yavin.","Wears a mustache.","Luke’s childhood friend killed in the trench run."]],
+["Cobb Vanth",["Cobb","Vanth"],3,["First appeared in Chuck Wendig’s Aftermath novels.","Bought armor from Jawas.","Marshal of a small Tatooine town.","Wore Boba Fett’s armor for a while.","Played by Timothy Olyphant in The Mandalorian."]],
+["Darth Plagueis",["Plagueis","Plagueis the Wise"],3,["A Muun.","Searched for a way to cheat death.","Trained Palpatine.","Could supposedly influence midi-chlorians to create life.","Sith Lord whose tragedy Palpatine recounts at the opera."]],
+["Bossk",[],3,["A Trandoshan.","Hunts Wookiees with special enthusiasm.","Flies the Hound’s Tooth.","Among the hunters Vader summons to the Executor.","Reptilian bounty hunter in The Empire Strikes Back."]],
+["Admiral Piett",["Piett","Firmus Piett"],3,["Was born on Axxila.","Captain of the Executor.","Promoted on the spot when his superior was killed.","Commanded the Executor at Endor.","Officer Vader promotes after choking Admiral Ozzel."]]
+];
+const CHARS = DATA.map(([name,aliases,diff,hints])=>({name,aliases,diff,hints}));
+const ROUND_LEN = 10;
+const SQUARES = ["🟩","🟨","🟧","🟥","🟪"];
+const TIER_NAMES = {0:"Mixed",1:"Casual",2:"Fan",3:"Deep cut"};
+const SECTIONS = ["home","setup","game","end","quiz","qresult","odds","oddsEnd","han"];
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"");
+const $ = id => document.getElementById(id);
+let state = null;
+
+function store(key, val){
+  try{ if(val===undefined) return JSON.parse(localStorage.getItem(key)); localStorage.setItem(key, JSON.stringify(val)); }
+  catch(e){ return null; }
+}
+function show(id){
+  SECTIONS.forEach(s=>$(s).classList.toggle("hidden", s!==id));
+  $("backBtn").classList.toggle("hidden", id==="home");
+  window.scrollTo(0,0);
+}
+function goHome(){ hideSuggest(); state=null; quiz=null; show("home"); $("goGuess").focus({preventScroll:true}); }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function renderBest(){
+  const best = store("holocron-best") || {};
+  const parts = Object.keys(TIER_NAMES).filter(k=>best[k]!=null).map(k=>`${TIER_NAMES[k]} ${best[k]}`);
+  $("bestLine").textContent = parts.length ? "Your best: " + parts.join(", ") : "";
+}
+function openSetup(){ renderBest(); show("setup"); }
+
+function startRun(){
+  const tier = +document.querySelector('input[name="tier"]:checked').value;
+  const pool = tier ? CHARS.filter(c=>c.diff===tier) : CHARS;
+  state = { tier, queue: shuffle(pool).slice(0, ROUND_LEN), i:0, score:0, results:[] };
+  show("game");
+  startCharacter();
+}
+function startCharacter(){
+  state.cur = state.queue[state.i];
+  state.shown = 1; state.misses = []; state.done = false;
+  $("roundNum").textContent = state.i + 1;
+  $("scoreNum").textContent = state.score;
+  $("reveal").classList.add("hidden");
+  $("guessArea").classList.remove("hidden");
+  $("misses").innerHTML = ""; $("flash").textContent = "";
+  $("guessInput").value = ""; hideSuggest();
+  renderLadder(0);
+  $("guessInput").focus();
+}
+function renderLadder(freshIdx){
+  const ol = $("ladder"); ol.innerHTML = "";
+  state.cur.hints.forEach((h,idx)=>{
+    const li = document.createElement("li");
+    if(idx < state.shown || state.done){ li.className = "open" + (idx===freshIdx ? " fresh" : ""); li.textContent = h; }
+    else { li.className = "sealed"; li.innerHTML = `Sealed <span class="bars"></span>`; }
+    ol.appendChild(li);
+  });
+  const pts = state.done ? 0 : 6 - state.shown;
+  $("meter").innerHTML = Array.from({length:5},(_,k)=>`<i class="${k < pts ? "" : "spent"}"></i>`).join("");
+  $("hintBtn").disabled = state.shown >= 5;
+  $("hintBtn").textContent = state.shown >= 5 ? "No hints left" : `Unseal hint ${state.shown+1}`;
+}
+function nextHint(){ if(state.shown < 5){ state.shown++; renderLadder(state.shown-1); } else finishCharacter(false); }
+function isMatch(guess, c){ const g = norm(guess); if(!g) return false; return [c.name, ...c.aliases].some(n => norm(n) === g); }
+function submitGuess(text){
+  const guess = (text ?? $("guessInput").value).trim();
+  hideSuggest();
+  if(!guess || state.done) return;
+  if(isMatch(guess, state.cur)) return finishCharacter(true);
+  state.misses.push(guess);
+  $("misses").innerHTML = state.misses.map(m=>`<span>${escapeHtml(m)}</span>`).join("");
+  $("guessInput").value = "";
+  if(state.shown >= 5){ finishCharacter(false); return; }
+  $("flash").textContent = "Not them. The next hint is unsealed.";
+  nextHint();
+  $("guessInput").focus();
+}
+function finishCharacter(won){
+  state.done = true;
+  const pts = won ? 6 - state.shown : 0;
+  state.score += pts;
+  state.results.push({ name: state.cur.name, won, hint: state.shown, pts });
+  $("scoreNum").textContent = state.score;
+  renderLadder(-1);
+  $("guessArea").classList.add("hidden");
+  const r = $("reveal");
+  r.classList.remove("hidden","win","lose"); r.classList.add(won ? "win" : "lose");
+  $("verdict").textContent = won ? `Got it on hint ${state.shown}. +${pts} ${pts===1?"point":"points"}` : "The archives keep this one. 0 points";
+  $("who").textContent = state.cur.name;
+  $("whoNote").textContent = state.cur.aliases.length ? "Also known as " + state.cur.aliases.join(", ") : "";
+  $("nextBtn").textContent = state.i + 1 >= state.queue.length ? "See results" : "Next character";
+  $("nextBtn").focus();
+}
+function nextCharacter(){ state.i++; if(state.i >= state.queue.length) return endRun(); startCharacter(); }
+function endRun(){
+  const max = state.queue.length * 5;
+  $("finalScore").textContent = `${state.score}/${max}`;
+  const best = store("holocron-best") || {};
+  const prev = best[state.tier];
+  let note = `${TIER_NAMES[state.tier]} difficulty.`;
+  if(prev==null || state.score > prev){ best[state.tier] = state.score; store("holocron-best", best); if(prev!=null) note += " New personal best."; }
+  else note += ` Your best is ${prev}.`;
+  $("finalNote").textContent = note;
+  $("grid").textContent = gridString();
+  $("recap").innerHTML = state.results.map(r=>`<li><span>${escapeHtml(r.name)}</span><span>${r.won ? `hint ${r.hint}, +${r.pts}` : "missed"}</span></li>`).join("");
+  $("shareFlash").textContent = "";
+  show("end");
+}
+function gridString(){ return state.results.map(r => r.won ? SQUARES[r.hint-1] : "⬛").join(""); }
+
+// Autocomplete
+const NAMES = CHARS.flatMap(c => [{label:c.name, alt:""}, ...c.aliases.map(a=>({label:a, alt:c.name}))]);
+let sel = -1, items = [];
+function updateSuggest(){
+  const q = norm($("guessInput").value);
+  if(q.length < 2){ hideSuggest(); return; }
+  const starts = [], contains = [];
+  for(const n of NAMES){ const k = norm(n.label); if(k.startsWith(q)) starts.push(n); else if(k.includes(q)) contains.push(n); }
+  items = [...starts, ...contains].slice(0,7); sel = -1;
+  if(!items.length){ hideSuggest(); return; }
+  $("suggest").innerHTML = items.map((n,i)=>`<li role="option" id="opt${i}" aria-selected="false" data-i="${i}">${escapeHtml(n.label)}${n.alt?`<small>${escapeHtml(n.alt)}</small>`:""}</li>`).join("");
+  $("suggest").classList.remove("hidden");
+  $("guessInput").setAttribute("aria-expanded","true");
+}
+function hideSuggest(){ $("suggest").classList.add("hidden"); items=[]; sel=-1; $("guessInput").setAttribute("aria-expanded","false"); }
+function moveSel(d){
+  if(!items.length) return;
+  sel = (sel + d + items.length) % items.length;
+  [...$("suggest").children].forEach((li,i)=>li.setAttribute("aria-selected", i===sel));
+  $("guessInput").setAttribute("aria-activedescendant","opt"+sel);
+}
+$("guessInput").addEventListener("input", updateSuggest);
+$("guessInput").addEventListener("keydown", e=>{
+  if(e.key==="ArrowDown"){ e.preventDefault(); moveSel(1); }
+  else if(e.key==="ArrowUp"){ e.preventDefault(); moveSel(-1); }
+  else if(e.key==="Escape"){ hideSuggest(); }
+  else if(e.key==="Enter"){ e.preventDefault(); submitGuess(sel>=0 && items[sel] ? items[sel].label : undefined); }
+});
+$("suggest").addEventListener("mousedown", e=>{ const li = e.target.closest("li"); if(!li) return; e.preventDefault(); submitGuess(items[+li.dataset.i].label); });
+document.addEventListener("click", e=>{ if(!e.target.closest(".guess")) hideSuggest(); });
+
+$("backBtn").addEventListener("click", goHome);
+$("goGuess").addEventListener("click", openSetup);
+$("goQuiz").addEventListener("click", startQuiz);
+
+// ===== Han Solo files =====
+const HAN_CATS = {all:"All", bts:"Behind the scenes", film:"On screen", canon:"Canon books and comics", legends:"Legends", special:"Special"};
+const HAN_FACTS = [
+ ["bts","In George Lucas’s earliest rough draft, Han wasn’t human at all: he was a green-skinned Ureallian with enormous gills and no nose. The next draft turned him into a bearded, flamboyant pirate, and once Han became human, Chewbacca inherited the job of alien sidekick."],
+ ["bts","The Solo crew built two of Han’s speeders for real, on custom chassis with V8 engines that could top 100 mph. Unfortunately, they couldn’t actually hover."],
+ ["bts","Lucas partly based Han’s smooth-talking charm on his friend Francis Ford Coppola, and his notes also point to Humphrey Bogart and a James Dean–style star pilot."],
+ ["bts","Harrison Ford was first brought in only to read lines opposite actors auditioning for other parts. His readings ended up winning him the role."],
+ ["bts","Han’s famous blaster prop was built on a real Mauser C96 “broomhandle” pistol, a German design from the 1890s, dressed up with a scope and other add-ons to look like it came from another galaxy."],
+ ["bts","Ford improvised Han’s famous two-word reply when Leia tells him she loves him just before the carbon freeze."],
+ ["film","The only time Han uses a lightsaber in the original trilogy is on Hoth, when he borrows Luke’s to slice open a tauntaun and keep Luke from freezing."],
+ ["film","In Solo, it’s Tobias Beckett who hands Han the DL-44 blaster that becomes his trademark."],
+ ["canon","An Imperial recruitment officer gave him the surname Solo because he had no family. At the Academy he was Cadet 124-329."],
+ ["canon","Marvel’s Han Solo & Chewbacca comic finally named his father in canon: Ovan, who always dreamed of leaving Corellia on a ship like the Falcon."],
+ ["canon","After Endor, Han led a Rebel commando unit called the Pathfinders before settling down with Leia."],
+ ["canon","He once had a fake marriage. Sana Starros introduced herself to Leia as Han’s wife, until Han explained they had faked it as cover for a robbery. Their partnership fell apart, and Sana later tracked him down over what he owed her."],
+ ["canon","The novel Last Shot shows Han as a nervous new father, juggling toddler Ben and one last job with Lando."],
+ ["legends","Han’s closest childhood friend was a Wookiee cook, Dewlannamapia, usually called Dewlanna, aboard Garris Shrike’s ship Trader’s Luck. She was far more of a mother to him than Shrike ever was. Han could understand her Shyriiwook but never speak it well, and she understood Basic without speaking it."],
+ ["legends","As a kid, Han raced for his guardian, and Garris Shrike made small fortunes betting on the races Han rode in."],
+ ["legends","Han vowed to repay Dewlanna’s kindness by one day helping one of her people."],
+ ["legends","He only learned his own surname because Dewlanna got Shrike drunk enough to let it slip."],
+ ["legends","On Ylesia he flew spice under the alias Vykk Draygo, watched over by a Togorian bodyguard named Muuurgh."],
+ ["legends","He once accidentally killed a Hutt, years before he ended up owing one money. It happened during his escape from Ylesia."],
+ ["legends","Another of his aliases, Jenos Idanian, is an anagram of Indiana Jones."],
+ ["legends","His first love, Bria Tharen, was a pilgrim he rescued from Ylesia. She later became a Rebel commander."],
+ ["legends","Legends Han was an Imperial officer until he refused an order to kill a Wookiee slave. That Wookiee was Chewbacca, which is where the life debt comes from."],
+ ["legends","His reward for helping destroy the Death Star was stolen. Right after the Battle of Yavin, the pirate Crimson Jack took it, leaving Han still deep in debt to Jabba and needing one more lucrative, extremely dangerous job."],
+ ["legends","Brian Daley’s Han Solo Adventures (1979 to 1980), set in the Corporate Sector, were among the very first Star Wars spin-off novels."],
+ ["legends","He once won an entire planet, Dathomir, in a game of sabacc."],
+ ["legends","In the Star Wars Tales story “Into the Great Unknown,” Han crash-lands on an Earth-like planet. Generations later, Indiana Jones finds his skeleton."],
+ ["special","Never tell me the odds? Here’s one anyway. The Solo team looked at about 3,000 actors to play young Han, and the one they chose, Alden Ehrenreich, was the very first to audition. Born on November 22, 1989, he was 27 when cameras rolled at Pinewood Studios in London in early 2017, after beating odds of roughly 3,000 to 1. A young pilot beating impossible odds… sounds familiar."]
+];
+let hanFilter = "all";
+function buildSky(){
+  const sky = $("sky"); if(sky.childElementCount) return;
+  const r = (a,b)=>(a+Math.random()*(b-a)).toFixed(2);
+  let h = "";
+  for(let i=0;i<110;i++){ const s=r(1,2.6); h += `<i style="left:${r(0,100)}%;top:${r(0,100)}%;width:${s}px;height:${s}px;--d:${r(2,6)}s;--w:-${r(0,6)}s"></i>`; }
+  for(let i=0;i<18;i++){ h += `<b style="left:${r(0,97)}%;top:${r(0,98)}%;--s:${r(6,15)}px;--d:${r(3,7)}s;--w:-${r(0,7)}s"></b>`; }
+  sky.innerHTML = h;
+}
+function renderHan(lit){
+  $("hanChips").innerHTML = Object.entries(HAN_CATS).map(([k,v])=>`<button class="chip" data-k="${k}" aria-pressed="${k===hanFilter}">${v}</button>`).join("");
+  const list = HAN_FACTS.map((f,i)=>({c:f[0], t:f[1], i})).filter(f=>hanFilter==="all" || f.c===hanFilter);
+  $("hanCount").textContent = `${list.length} facts`;
+  const pip = (r,c)=>`<s style="grid-area:${r}/${c}"></s>`;
+  const dice = `<span class="dice" aria-hidden="true"><span class="die">${pip(1,1)+pip(3,3)}</span><span class="die">${pip(1,1)+pip(1,3)+pip(2,2)+pip(3,1)+pip(3,3)}</span></span>`;
+  $("hanFacts").innerHTML = list.map(f=> f.c==="special"
+    ? `<li id="hf${f.i}" class="special${f.i===lit?" lit":""}"><span class="src">Special: Han by the numbers</span><div class="big"><span class="n27">27</span>${dice}</div>${escapeHtml(f.t)}</li>`
+    : `<li id="hf${f.i}" class="${f.i===lit?"lit":""}"><span class="src">${HAN_CATS[f.c]}</span>${escapeHtml(f.t)}</li>`).join("");
+}
+function openHan(){ buildSky(); renderHan(); show("han"); }
+$("goHan").addEventListener("click", openHan);
+
+// Glitter around the Han button
+(function(){
+  const r = (a,b)=>(a+Math.random()*(b-a)).toFixed(2);
+  const wrap = $("hanWrap"), btn = $("goHan");
+  let g = "";
+  for(let i=0;i<14;i++){
+    const side = i%4, along = r(2,96);
+    const pos = side===0 ? `left:${along}%;top:-6px` : side===1 ? `left:${along}%;bottom:-6px` : side===2 ? `top:${r(5,85)}%;left:-6px` : `top:${r(5,85)}%;right:-6px`;
+    g += `<span class="glit" aria-hidden="true" style="${pos};--s:${r(7,14)}px;--d:${r(2.5,5)}s;--w:-${r(0,5)}s"></span>`;
+  }
+  wrap.insertAdjacentHTML("beforeend", g);
+  let s = "";
+  for(let i=0;i<34;i++){ const z=r(1,2.4); s += `<i aria-hidden="true" style="left:${r(0,100)}%;top:${r(0,100)}%;width:${z}px;height:${z}px;--d:${r(2,5)}s;--w:-${r(0,5)}s"></i>`; }
+  btn.insertAdjacentHTML("afterbegin", s);
+})();
+
+// ===== Tell me the odds =====
+const EP_NAMES = ["The Phantom Menace","Attack of the Clones","Revenge of the Sith","A New Hope","The Empire Strikes Back","Return of the Jedi","The Force Awakens","The Last Jedi","The Rise of Skywalker"];
+const ROMAN = ["I","II","III","IV","V","VI","VII","VIII","IX"];
+// [prompt, episodes it happens in, note]
+const ODDS = [
+ ["Someone loses a hand or arm to a lightsaber",[2,3,4,5,6],"Attack of the Clones has two: Zam Wesell and Anakin."],
+ ["Tatooine appears on screen",[1,2,3,4,6,9],"Rey visits the old Lars homestead at the very end of The Rise of Skywalker."],
+ ["Yoda appears on screen",[1,2,3,5,6,8],"He returns as a Force spirit in The Last Jedi. In The Rise of Skywalker he’s only heard."],
+ ["Chewbacca appears",[3,4,5,6,7,8,9],"He first shows up on Kashyyyk in Revenge of the Sith."],
+ ["C-3PO appears",[1,2,3,4,5,6,7,8,9],"He’s still being built by young Anakin in The Phantom Menace."],
+ ["R2-D2 appears",[1,2,3,4,5,6,7,8,9],"Even in The Force Awakens, where he spends most of the film powered down."],
+ ["Darth Vader appears in his full armor",[3,4,5,6],"He’s suited up at the end of Revenge of the Sith. Later films only show his melted helmet."],
+ ["Palpatine appears, in person or by hologram",[1,2,3,5,6,9],"His Empire Strikes Back hologram was reshot with Ian McDiarmid in 2004."],
+ ["Lando Calrissian appears",[5,6,9],"He returns in The Rise of Skywalker after skipping two films."],
+ ["Han Solo appears",[4,5,6,7,9],"He returns as Ben’s memory in The Rise of Skywalker."],
+ ["Obi-Wan appears on screen",[1,2,3,4,5,6],"In the sequel trilogy he’s only heard, never seen."],
+ ["Leia appears",[3,4,5,6,7,8,9],"She’s a newborn at the end of Revenge of the Sith."],
+ ["Luke Skywalker appears",[3,4,5,6,7,8,9],"Newborn in Revenge of the Sith, and only in the final shot of The Force Awakens."],
+ ["The Millennium Falcon appears",[3,4,5,6,7,8,9],"It has a blink-and-miss cameo landing on Coruscant in Revenge of the Sith."],
+ ["Ewoks appear",[6,9],"Wicket turns up in the final celebration of The Rise of Skywalker."],
+ ["Kashyyyk appears on screen",[3],"Only Revenge of the Sith actually visits the Wookiee homeworld."],
+ ["Jar Jar Binks appears",[1,2,3],"He has a silent appearance in Revenge of the Sith."],
+ ["Count Dooku appears",[2,3],"He loses his head early in Revenge of the Sith."],
+ ["Admiral Ackbar appears",[6,7,8],"He dies in The Last Jedi."],
+ ["Wedge Antilles appears",[4,5,6,9],"Denis Lawson returns for a cameo in The Rise of Skywalker."],
+ ["Qui-Gon Jinn’s voice is heard",[1,2,9],"Yoda hears him in Attack of the Clones, and he’s among the voices that speak to Rey."],
+ ["Snoke appears",[7,8,9],"Spare Snoke bodies float in tanks on Exegol in The Rise of Skywalker."],
+ ["A crossguard lightsaber appears",[7,8,9],"Kylo Ren’s saber, introduced in The Force Awakens."],
+ ["Dagobah appears",[5,6],"Yoda dies there in Return of the Jedi."],
+ ["A Gungan appears",[1,2,3,6],"Return of the Jedi’s updated ending shows celebrations on Naboo."],
+ ["Mace Windu appears",[1,2,3],"He’s on the Jedi Council in The Phantom Menace."],
+ ["Coruscant appears",[1,2,3,6],"Return of the Jedi’s updated ending includes celebrations on Coruscant."],
+ ["Jabba the Hutt appears",[1,4,6],"He watches the podrace, and his A New Hope scene was restored in 1997."]
+];
+let odds = null;
+function startOdds(){ odds = { queue: shuffle(ODDS).slice(0,10), i:0, score:0, results:[] }; show("odds"); renderOdds(); }
+function renderOdds(){
+  const it = odds.queue[odds.i]; odds.done = false;
+  $("oNum").textContent = odds.i+1;
+  $("oScore").textContent = odds.score;
+  $("oPrompt").textContent = it[0];
+  $("oReveal").classList.add("hidden");
+  $("oNums").innerHTML = Array.from({length:10},(_,n)=>`<button class="num" data-n="${n}">${n}</button>`).join("");
+  $("oNums").querySelector("button").focus({preventScroll:true});
+}
+function pickOdds(n){
+  if(odds.done) return; odds.done = true;
+  const it = odds.queue[odds.i], ans = it[1].length, diff = Math.abs(n-ans);
+  const pts = diff===0 ? 3 : diff===1 ? 1 : 0;
+  odds.score += pts;
+  odds.results.push({p:it[0], n, ans, pts});
+  $("oScore").textContent = odds.score;
+  [...$("oNums").children].forEach(b=>{ const v=+b.dataset.n; b.disabled=true; if(v===ans) b.classList.add("right"); else if(v===n) b.classList.add("wrong"); });
+  const r = $("oReveal");
+  r.classList.remove("hidden","win","lose","near");
+  r.classList.add(pts===3 ? "win" : pts===1 ? "near" : "lose");
+  $("oVerdict").textContent = pts===3 ? `Exactly right: ${ans} of 9. +3` : pts===1 ? `Off by one. It’s ${ans} of 9. +1` : `Not quite. It’s ${ans} of 9.`;
+  $("oEps").innerHTML = ROMAN.map((rn,k)=>`<span class="ep${it[1].includes(k+1)?" on":""}" title="${EP_NAMES[k]}">${rn}</span>`).join("");
+  $("oNote").textContent = it[2] || "";
+  $("oNext").textContent = odds.i+1 >= odds.queue.length ? "See results" : "Next prompt";
+  $("oNext").focus();
+}
+function nextOdds(){ odds.i++; if(odds.i >= odds.queue.length) return endOdds(); renderOdds(); }
+function oddsGrid(){ return odds.results.map(r=> r.pts===3 ? "🎯" : r.pts===1 ? "🟡" : "⚫").join(""); }
+function endOdds(){
+  const max = odds.queue.length*3;
+  $("oFinal").textContent = `${odds.score}/${max}`;
+  const prev = store("holocron-odds-best");
+  let note = "";
+  if(prev==null || odds.score > prev){ store("holocron-odds-best", odds.score); if(prev!=null) note = "New personal best."; }
+  else note = `Your best is ${prev}.`;
+  $("oFinalNote").textContent = note;
+  $("oGrid").textContent = oddsGrid();
+  $("oRecap").innerHTML = odds.results.map(r=>`<li><span>${escapeHtml(r.p)}</span><span>you ${r.n}, answer ${r.ans}</span></li>`).join("");
+  $("oShareFlash").textContent = "";
+  show("oddsEnd");
+}
+$("goOdds").addEventListener("click", startOdds);
+
+// ===== Background music: original tracks, synthesized live with Web Audio =====
+const Music = (()=>{
+  const TRACKS = [
+    {name:"Twin Suns Drift", mood:"warm desert dusk", bpm:64, bpc:4, wet:.45,
+     chords:[[62,65,69],[58,62,65],[60,65,69],[60,64,67]],
+     pad:{type:"triangle", gain:.03, a:1.2, r:1.5, cut:1800},
+     arp:{type:"triangle", div:2, pat:[0,1,2,1], oct:12, gain:.028, len:1.6, r:.6, cut:2600},
+     bass:{type:"sine", steps:[0], oct:-24, gain:.09, len:15, a:.3, r:1, cut:600}},
+    {name:"Hyperspace Lane", mood:"fast and driving", bpm:112, bpc:4, wet:.3,
+     chords:[[57,60,64],[57,60,65],[55,60,64],[55,59,62]],
+     pad:{type:"sawtooth", gain:.016, a:.4, r:.8, cut:900},
+     arp:{type:"sawtooth", div:4, pat:[0,1,2,1,0,2,1,2], oct:12, gain:.015, len:.9, r:.15, cut:1900},
+     bass:{type:"sawtooth", steps:[0,3,6,8,11,14], oct:-24, gain:.05, len:1.5, r:.1, cut:420},
+     kick:[0,8], hat:[4,12]},
+    {name:"Dagobah Fog", mood:"misty and mysterious", bpm:48, bpc:8, wet:.6,
+     chords:[[52,59,62,66],[48,55,59,64]],
+     pad:{type:"sine", gain:.035, a:3, r:3, cut:1400},
+     arp:{type:"triangle", div:1, pat:[3,1,2,0], oct:12, gain:.026, len:3, r:1.2, cut:2200, prob:.35},
+     drone:{note:28, gain:.06}},
+    {name:"Outer Rim Swing", mood:"a cantina on a slow night", bpm:126, bpc:4, wet:.2, swing:.32,
+     chords:[[53,57,60,63],[58,62,65,68],[55,58,60,64],[53,57,60,65]],
+     stabs:{type:"square", steps:[4,12], gain:.011, len:.8, cut:1600},
+     arp:{type:"square", div:2, pat:[3,2,1,2], oct:12, gain:.011, len:.6, r:.08, cut:2200, prob:.6},
+     walk:{type:"triangle", gain:.12, cut:900, offs:[0,4,7,9]},
+     kick:[0,8], hat:[2,6,10,14]},
+    {name:"Bespin Clouds", mood:"floating above it all", bpm:72, bpc:4, wet:.55,
+     chords:[[51,55,58,62],[55,58,62,65],[56,60,63,67],[58,62,65,70]],
+     pad:{type:"triangle", gain:.026, a:1.5, r:2, cut:2000},
+     arp:{type:"sine", div:2, pat:[0,2,3,1,2,0,3,2], oct:24, gain:.02, len:3, r:1.2, cut:5000}},
+    {name:"Falcon Cockpit Hum", mood:"engines idling, systems blinking", bpm:40, bpc:8, wet:.5,
+     chords:[[38,45,50],[36,43,48]],
+     pad:{type:"sawtooth", gain:.028, a:4, r:4, cut:320},
+     drone:{note:26, gain:.07}, blips:.05}
+  ];
+  const ICON = {
+    play:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>',
+    pause:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>'
+  };
+  let ctx=null, master, verb, noise, bus=null, send=null, timer=null;
+  let cur=0, step=0, nextT=0, limit=0, playing=false;
+  const saved = store("holocron-vol");
+  let vol = (typeof saved==="number" ? saved : 45)/100;
+  const mtof = m=>440*Math.pow(2,(m-69)/12);
+
+  function init(){
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = vol*1.2;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value=-18; comp.ratio.value=4;
+    master.connect(comp); comp.connect(ctx.destination);
+    verb = ctx.createConvolver(); verb.buffer = impulse(3.5); verb.connect(master);
+    noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    const d = noise.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  }
+  function impulse(sec){
+    const n=Math.floor(ctx.sampleRate*sec), b=ctx.createBuffer(2,n,ctx.sampleRate);
+    for(let c=0;c<2;c++){ const d=b.getChannelData(c); for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.8); }
+    return b;
+  }
+  function newBus(){
+    if(bus){ const ob=bus, os=send; ob.gain.cancelScheduledValues(ctx.currentTime); ob.gain.setTargetAtTime(0, ctx.currentTime, .4); setTimeout(()=>{ try{ ob.disconnect(); os.disconnect(); }catch(e){} }, 4000); }
+    bus = ctx.createGain(); bus.gain.setValueAtTime(0, ctx.currentTime); bus.gain.linearRampToValueAtTime(1, ctx.currentTime+1.5);
+    send = ctx.createGain(); send.gain.value = TRACKS[cur].wet;
+    bus.connect(master); bus.connect(send); send.connect(verb);
+  }
+  function tone(t, midi, dur, o){
+    const osc=ctx.createOscillator(); osc.type=o.type; osc.frequency.setValueAtTime(mtof(midi), t);
+    const f=ctx.createBiquadFilter(); f.type="lowpass"; f.frequency.value=o.cut||2000;
+    const g=ctx.createGain(); const a=o.a ?? .01, r=o.r ?? .3, hold=Math.max(a,dur);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(o.gain, t+a); g.gain.setTargetAtTime(0, t+hold, r/3);
+    osc.connect(f); f.connect(g); g.connect(bus);
+    osc.start(t); osc.stop(t+hold+r*2+.1);
+  }
+  function hat(t){
+    const s=ctx.createBufferSource(); s.buffer=noise;
+    const f=ctx.createBiquadFilter(); f.type="highpass"; f.frequency.value=7000;
+    const g=ctx.createGain(); g.gain.setValueAtTime(.022,t); g.gain.exponentialRampToValueAtTime(.0001,t+.06);
+    s.connect(f); f.connect(g); g.connect(bus); s.start(t); s.stop(t+.08);
+  }
+  function kick(t){
+    const o=ctx.createOscillator(); o.type="sine"; o.frequency.setValueAtTime(110,t); o.frequency.exponentialRampToValueAtTime(40,t+.15);
+    const g=ctx.createGain(); g.gain.setValueAtTime(.12,t); g.gain.exponentialRampToValueAtTime(.0001,t+.3);
+    o.connect(g); g.connect(bus); o.start(t); o.stop(t+.32);
+  }
+  function schedule(t, s){
+    const T=TRACKS[cur], sd=60/T.bpm/4, spc=T.bpc*4, cyc=spc*T.chords.length;
+    const ch=T.chords[Math.floor(s/spc)%T.chords.length], pos=s%spc, bar=pos%16;
+    const tt = (T.swing && s%2===1) ? t+sd*T.swing : t;
+    if(pos===0 && T.pad) ch.forEach((n,i)=>tone(t+i*.02, n, spc*sd, T.pad));
+    if(T.drone && s%cyc===0) tone(t, T.drone.note, cyc*sd, {type:"sine", gain:T.drone.gain, a:4, r:4, cut:400});
+    if(T.arp){ const every=4/T.arp.div; if(s%every===0 && (!T.arp.prob || Math.random()<T.arp.prob)){ const k=(s/every)%T.arp.pat.length; tone(tt, ch[T.arp.pat[k]%ch.length]+T.arp.oct, T.arp.len*sd, T.arp); } }
+    if(T.bass && T.bass.steps.includes(bar)) tone(tt, ch[0]+T.bass.oct, T.bass.len*sd, T.bass);
+    if(T.walk && bar%4===0) tone(tt, ch[0]-12+T.walk.offs[(bar/4)%4], 3.5*sd, {...T.walk, a:.01, r:.15});
+    if(T.stabs && T.stabs.steps.includes(bar)) ch.forEach(n=>tone(tt, n, T.stabs.len*sd, {...T.stabs, a:.005, r:.1}));
+    if(T.kick && T.kick.includes(bar)) kick(t);
+    if(T.hat && T.hat.includes(bar)) hat(tt);
+    if(T.blips && Math.random()<T.blips) tone(t, 84+Math.floor(Math.random()*12), .6*sd, {type:"sine", gain:.012, a:.005, r:.08, cut:6000});
+  }
+  function lengthFor(T){ const sd=60/T.bpm/4, cyc=T.bpc*4*T.chords.length; return Math.max(1, Math.round(170/(sd*cyc)))*cyc; }
+  function startTrack(){ newBus(); step=0; nextT=ctx.currentTime+.1; limit=lengthFor(TRACKS[cur]); }
+  function tick(){
+    if(!playing) return;
+    const sd=60/TRACKS[cur].bpm/4;
+    while(nextT < ctx.currentTime+.25){
+      schedule(nextT, step); step++; nextT += sd;
+      if(step>=limit){ go(cur+1); return; }
+    }
+  }
+  function go(i){ cur=(i+TRACKS.length)%TRACKS.length; if(ctx) startTrack(); ui(); }
+  function toggle(){
+    if(!ctx) init();
+    if(playing){ playing=false; ctx.suspend(); }
+    else { playing=true; ctx.resume(); if(!bus) startTrack(); if(!timer) timer=setInterval(tick, 60); }
+    ui();
+  }
+  function setVol(v){ vol=v/100; store("holocron-vol", +v); if(master) master.gain.setTargetAtTime(vol*1.2, ctx.currentTime, .05); }
+  function ui(){
+    const T=TRACKS[cur];
+    $("mTitle").textContent = T.name;
+    $("mSub").textContent = `Track ${cur+1} of ${TRACKS.length}: ${T.mood}${playing ? "" : " (paused)"}`;
+    $("mPlay").innerHTML = playing ? ICON.pause : ICON.play;
+    $("mPlay").setAttribute("aria-label", playing ? "Pause music" : "Play music");
+  }
+  $("mVol").value = Math.round(vol*100);
+  return { toggle, next:()=>go(cur+1), prev:()=>go(cur-1), setVol, ui };
+})();
+Music.ui();
+$("mPlay").addEventListener("click", Music.toggle);
+$("mNext").addEventListener("click", Music.next);
+$("mPrev").addEventListener("click", Music.prev);
+$("mVol").addEventListener("input", e=>Music.setVol(e.target.value));
+$("oNums").addEventListener("click", e=>{ const b=e.target.closest(".num"); if(b) pickOdds(+b.dataset.n); });
+$("oNext").addEventListener("click", nextOdds);
+$("oAgain").addEventListener("click", startOdds);
+$("oShare").addEventListener("click", ()=>copyText(`Holocron Trivia: Tell me the odds ${odds.score}/${odds.queue.length*3}\n${oddsGrid()}`, "oShareFlash"));
+$("hanChips").addEventListener("click", e=>{ const b=e.target.closest(".chip"); if(!b) return; hanFilter=b.dataset.k; renderHan(); });
+
+$("startBtn").addEventListener("click", startRun);
+$("guessBtn").addEventListener("click", ()=>submitGuess());
+$("hintBtn").addEventListener("click", ()=>{ $("flash").textContent=""; nextHint(); $("guessInput").focus(); });
+$("giveBtn").addEventListener("click", ()=>finishCharacter(false));
+$("nextBtn").addEventListener("click", nextCharacter);
+$("againBtn").addEventListener("click", startRun);
+$("menuBtn").addEventListener("click", openSetup);
+$("shareBtn").addEventListener("click", ()=>copyText(`Holocron Trivia (${TIER_NAMES[state.tier]}) ${state.score}/${state.queue.length*5}\n${gridString()}`, "shareFlash"));
+// ===== Personality quiz =====
+// Traits, each scored 0-4 per character (2 is neutral)
+const AXES = [
+  ["B","Cautious","Bold"],
+  ["S","Self-interested","Selfless"],
+  ["O","Free spirit","By the book"],
+  ["M","Ruthless","Merciful"],
+  ["H","Serious","Playful"],
+  ["F","Practical","Spiritual"],
+  ["C","Lone wolf","People person"]
+];
+// [name, traits B S O M H F C, blurb]
+const PEOPLE = [
+["Luke Skywalker","3424243","An idealist who sees the good in people others have given up on."],
+["Leia Organa","4433224","A born leader who runs toward trouble and organizes everyone on the way."],
+["Han Solo","4202402","Claims to look out for number one, then comes back for his friends anyway."],
+["Chewbacca","3413313","Fiercely loyal, big-hearted, and terrifying when someone threatens his people."],
+["Darth Vader","3140030","Relentless, disciplined, and driven by something buried deep."],
+["Obi-Wan Kenobi","2434342","Patient and principled, with a dry wit for every disaster."],
+["Yoda","1424341","Quietly wise, endlessly patient, and stranger than he first appears."],
+["Palpatine","2040141","A long-game strategist who believes control is the only real safety."],
+["R2-D2","4413302","Small, brave, stubborn, and usually right."],
+["C-3PO","0343304","Anxious, proper, and devoted to the people he complains about most."],
+["Lando Calrissian","3213414","A smooth talker who gambles big and comes through when it counts."],
+["Boba Fett","3121000","Few words, strict code, and a reputation that walks in before he does."],
+["Anakin Skywalker","4201242","Brilliant and passionate, with a heart that pulls him in every direction."],
+["Padmé Amidala","3434114","Principled and brave, convinced diplomacy can still win."],
+["Qui-Gon Jinn","2404242","Follows the living Force over the rulebook, every time."],
+["Mace Windu","3342031","Intense, disciplined, and very hard to fool."],
+["Count Dooku","1141031","Elegant and idealistic, until disillusionment curdled into something darker."],
+["Darth Maul","4010030","Pure focus and fury, with a grudge that lasts decades."],
+["General Grievous","4020101","Aggressive, theatrical, and a little too fond of collecting trophies."],
+["Jar Jar Binks","2303414","Clumsy, cheerful, and lucky in ways nobody can explain."],
+["Jango Fett","3121100","A professional who keeps his deals and his son close."],
+["Ahsoka Tano","3414231","Independent and compassionate, she walks her own path."],
+["Captain Rex","3433203","A soldier’s soldier who learned when orders must be broken."],
+["Asajj Ventress","3101330","Sharp-tongued survivor who reinvents herself after every betrayal."],
+["Hondo Ohnaka","3002404","A charming opportunist who somehow ends up helping the heroes."],
+["Cad Bane","3010200","Cool, calculating, and always paid in advance."],
+["Plo Koon","2434233","A gentle protector who never leaves anyone behind."],
+["Kit Fisto","3324443","Easygoing and confident, smiling straight into danger."],
+["Savage Opress","4110020","Raw strength looking for someone to follow."],
+["Bo-Katan Kryze","4322102","A proud warrior who keeps fighting for her people’s future."],
+["Satine Kryze","1434113","A pacifist with a spine of steel."],
+["Kanan Jarrus","3413332","A laid-back drifter who rediscovers who he’s meant to be."],
+["Ezra Bridger","4303433","A street-smart kid with a big heart and bigger instincts."],
+["Hera Syndulla","4423214","Holds the crew together and flies like the galaxy depends on it."],
+["Sabine Wren","4303402","Artist, rebel, and explosives expert, in that order."],
+["Garazeb Orrelios","4312312","Big, gruff, and much softer than he lets on."],
+["Chopper","4201401","Grumpy, chaotic, and secretly devoted."],
+["Grand Admiral Thrawn","1141101","Observes everything, reveals nothing, and is three moves ahead."],
+["Alexsandr Kallus","2333101","A by-the-book officer who had the courage to change sides."],
+["The Grand Inquisitor","3040131","Methodical, mocking, and loyal to the hierarchy."],
+["Jyn Erso","4303211","A loner who discovers she’s willing to fight for something."],
+["Cassian Andor","3412101","Does the hard, dirty work so others don’t have to."],
+["K-2SO","3322401","Brutally honest, deeply loyal, and always calculating the odds."],
+["Chirrut Îmwe","4424342","Faith so strong it reads as fearlessness."],
+["Baze Malbus","4412211","Gruff and practical, fiercely protective of his partner."],
+["Bodhi Rook","1414102","Nervous but brave when it matters most."],
+["Orson Krennic","2040102","Ambitious to the bone and desperate for recognition."],
+["Saw Gerrera","4200011","A fighter so committed that the cause swallowed him."],
+["Grand Moff Tarkin","1040001","Cold, controlled, and convinced fear keeps order."],
+["Mon Mothma","1433114","A patient politician playing a very dangerous long game."],
+["Luthen Rael","2300101","Sacrifices everything, including his own conscience, for the cause."],
+["Syril Karn","2141000","Rule-obsessed and determined to prove himself."],
+["Dedra Meero","2040001","Precise, ambitious, and frighteningly good at her job."],
+["Kino Loy","2332103","Keeps his head down until he decides to lead."],
+["Din Djarin","3443120","Lives by a code and protects what’s his."],
+["Grogu","2313442","Curious, mischievous, and far more powerful than he looks."],
+["Greef Karga","2222304","A deal-maker who turns out to have a decent heart."],
+["Cara Dune","4322202","A tough veteran who just wants a fair fight."],
+["Fennec Shand","3221101","Composed, lethal, and loyal to whoever earned it."],
+["Moff Gideon","2040111","Calculating and controlling, with contingency plans for his plans."],
+["Kuiil","1424211","Quiet, kind, and done fighting. He has spoken."],
+["IG-11","3342100","Follows his programming with absolute commitment."],
+["Cobb Vanth","3423303","A frontier lawman protecting a town nobody else would."],
+["Rey","4414242","Self-reliant and hopeful, searching for where she belongs."],
+["Finn","3414313","Chose to walk away from everything he knew to do the right thing."],
+["Poe Dameron","4303413","A hotshot pilot who leads from the cockpit."],
+["Kylo Ren","4121040","Torn between two legacies and furious about it."],
+["BB-8","3414403","Eager, brave, and endlessly loyal."],
+["Rose Tico","3424203","Saves what she loves rather than fighting what she hates."],
+["Maz Kanata","2314444","Ancient, nosy, and wiser than anyone in her cantina."],
+["General Hux","1040102","Ambitious, rigid, and loves a speech."],
+["Captain Phasma","3040101","Survives by being useful to whoever holds power."],
+["Snoke","1030141","A manipulator pulling strings from the shadows."],
+["Amilyn Holdo","2433112","Unconventional, misunderstood, and ready to sacrifice herself."],
+["Wedge Antilles","3423203","The steady wingman who keeps showing up."],
+["Admiral Ackbar","1433103","A careful commander who spots the trap."],
+["Nien Nunb","3313303","Unflappable co-pilot who just gets the job done."],
+["Wicket","3313313","Small, curious, and braver than anyone expects."],
+["Jabba the Hutt","1010304","Holds court, enjoys luxury, and settles grudges."],
+["Bib Fortuna","0021102","Survives by staying close to whoever’s in charge."],
+["Watto","1011303","A haggler who respects only a good wager."],
+["Sebulba","4000201","Wins at any cost and loves the danger."],
+["Dexter Jettster","2313404","A friendly fixer who knows a little about everything."],
+["Qi’ra","2111102","Survives by staying two steps ahead and showing no weakness."],
+["Tobias Beckett","3101301","Trusts no one, which he’ll tell you is good advice."],
+["L3-37","4303403","Outspoken, idealistic, and fighting for droid rights."],
+["Enfys Nest","4413102","Looks like a pirate but is fighting for something bigger."],
+["Doctor Aphra","3001402","Brilliant, reckless, and morally flexible."],
+["Mara Jade","3131331","A disciplined agent who learned to choose her own loyalties."],
+["Cal Kestis","3414332","A survivor rebuilding his trust in others."],
+["Merrin","2313341","Reserved and mystical, slowly opening up to new friends."],
+["Cere Junda","2424232","A teacher carrying old guilt and fierce protectiveness."],
+["Second Sister","3131030","Ambition forged from betrayal."],
+["Quinlan Vos","4202433","A rule-bending Jedi who loves undercover work a bit too much."],
+["Shaak Ti","2434132","Serene and caring, quietly guiding the next generation."],
+["Ki-Adi-Mundi","2343132","Logical and traditional, sometimes too sure of himself."],
+["Lobot","1333100","Silent, efficient, and dependable."],
+["Salacious B. Crumb","2000403","Lives for chaos and laughs at all the wrong moments."],
+["Max Rebo","1213404","Just wants to play music and get a free meal."],
+["Biggs Darklighter","3413303","The loyal friend who signs up for the danger with you."],
+["Darth Plagueis","1030040","Obsessed with knowledge and mastery over life itself."],
+["Wrecker","4413403","Loud, strong, and loves blowing things up."],
+["Omega","3414313","Optimistic and sharp, always learning from those around her."],
+["Admiral Piett","1242102","A competent officer trying to survive his boss."]
+];
+
+const QUESTIONS = [
+ ["Your ship’s hyperdrive dies mid-chase. You…",[
+   ["Pull a maneuver nobody has tried before",{B:2,O:-1}],
+   ["Calmly run diagnostics and fix it",{B:-1,O:2}],
+   ["Trust your instincts. Something will guide you.",{F:2,B:1}],
+   ["Crack a joke to keep everyone calm while you think",{H:2,C:1}]]],
+ ["A stranger begs for help but can’t pay.",[
+   ["Help them. Obviously.",{S:2,M:2}],
+   ["Help, but they’ll owe you one",{S:-1,C:1}],
+   ["Only if it doesn’t compromise the mission",{O:1,M:-1}],
+   ["Not your problem",{S:-2,M:-1,C:-1}]]],
+ ["Pick a cantina order.",[
+   ["Whatever’s strongest, then another round",{B:1,H:1,C:2}],
+   ["Tea, quietly, in a corner",{C:-2,F:1}],
+   ["Water. I’m working.",{O:2,H:-1}],
+   ["I came for information, not drinks",{C:-1,H:-2,O:1}]]],
+ ["Your ideal weapon is…",[
+   ["A lightsaber",{F:2}],
+   ["A trusty blaster",{F:-2,B:1}],
+   ["My words",{C:2,M:1,B:-1}],
+   ["A well-laid plan",{O:2,B:-1}]]],
+ ["Your commander gives an order you think is wrong.",[
+   ["Follow it. The chain of command exists for a reason.",{O:2}],
+   ["Argue, then follow it",{O:1,C:1}],
+   ["Quietly do what’s right instead",{O:-1,M:1}],
+   ["Ignore it, loudly",{O:-2,B:1}]]],
+ ["Your friends would call you…",[
+   ["The funny one",{H:2,C:1}],
+   ["The reliable one",{S:2,O:1}],
+   ["The intense one",{H:-2,B:1}],
+   ["The wise one",{F:1,M:1,B:-1}]]],
+ ["An enemy surrenders to you.",[
+   ["Spare them. Everyone deserves a second chance.",{M:2}],
+   ["Take them prisoner, by the book",{O:2}],
+   ["Use them to get what you want",{M:-1,S:-1}],
+   ["Mercy is a luxury",{M:-2}]]],
+ ["Where would you live?",[
+   ["A busy city world like Coruscant",{C:2,O:1}],
+   ["A desert outpost, far from everyone",{C:-2}],
+   ["A forest or jungle full of life",{F:2,M:1}],
+   ["On my ship, always moving",{O:-2,B:1}]]],
+ ["The Force is…",[
+   ["An energy that connects all living things",{F:2,M:1}],
+   ["A source of power for those strong enough to take it",{F:2,M:-2}],
+   ["Hokey religion. Give me a blaster.",{F:-2,H:1}],
+   ["Interesting, but I trust skill more",{F:-1,O:1}]]],
+ ["The plan falls apart. You…",[
+   ["Improvise. That’s the fun part.",{B:2,O:-2,H:1}],
+   ["Switch to plan B. You always have one.",{O:2,B:-1}],
+   ["Rally the team",{C:2,S:1}],
+   ["Handle it yourself",{C:-2,B:1}]]],
+ ["What do you want most?",[
+   ["Freedom",{O:-2,B:1}],
+   ["Order and peace",{O:2,M:1}],
+   ["To protect the people I love",{S:2,M:1}],
+   ["Power, or credits. Same thing.",{S:-2,M:-1}]]],
+ ["Choose a droid companion.",[
+   ["A chatty, anxious protocol droid",{C:2,H:1,B:-1}],
+   ["A brave, beeping astromech",{B:1,H:1,S:1}],
+   ["A sarcastic bodyguard who tells me the odds",{H:2,O:1}],
+   ["Droids are tools, not friends",{M:-1,C:-1,H:-1}]]],
+ ["Your group chat is planning a trip and nobody will decide anything.",[
+   ["Make the itinerary yourself and send it",{O:2,C:1,S:1}],
+   ["Book something spontaneous and tell them after",{B:2,O:-2}],
+   ["Wait. Someone else will sort it out.",{B:-1,C:-1}],
+   ["Send memes until somebody panics",{H:2,C:1}]]],
+ ["A coworker takes credit for your idea in a meeting.",[
+   ["Call it out on the spot",{B:2,M:-1}],
+   ["Talk to them privately afterward",{M:1,O:1}],
+   ["Let it go. It all evens out in the end.",{F:1,M:1,B:-1}],
+   ["Say nothing, and quietly make sure it never happens again",{S:-1,M:-1,C:-1}]]],
+ ["It’s Friday night and you have no plans.",[
+   ["Find the biggest party and bring friends",{C:2,H:1}],
+   ["A book, a long walk, or some quiet time alone",{C:-2,F:1}],
+   ["Fix, build, or tinker with something",{F:-2,O:1}],
+   ["Say yes to whatever adventure shows up",{B:2,O:-1}]]]
+];
+
+// Typical answer total and spread per trait, so scores are relative to an average player
+const RANGE = {};
+AXES.forEach(([k])=>{
+  let mean=0, vari=0;
+  QUESTIONS.forEach(([,opts])=>{
+    const vals = opts.map(o=>o[1][k]||0);
+    const m = vals.reduce((a,b)=>a+b,0)/vals.length;
+    mean += m; vari += vals.reduce((a,b)=>a+(b-m)**2,0)/vals.length;
+  });
+  RANGE[k]={mean, sd: Math.sqrt(vari)||1};
+});
+const MAXD = Math.sqrt(AXES.length*16);
+const STRETCH = 1.25; // how far one standard deviation moves you along a trait
+let quiz = null;
+
+function startQuiz(){
+  quiz = { i:0, picks: new Array(QUESTIONS.length).fill(null) };
+  show("quiz");
+  renderQuestion();
+}
+function renderQuestion(){
+  const [text, opts] = QUESTIONS[quiz.i];
+  $("qNum").textContent = quiz.i+1;
+  $("qTotal").textContent = QUESTIONS.length;
+  $("qBar").style.width = (quiz.i/QUESTIONS.length*100)+"%";
+  $("qText").textContent = text;
+  $("qPrev").disabled = quiz.i===0;
+  $("answers").innerHTML = opts.map((o,j)=>`<button class="answer${quiz.picks[quiz.i]===j?" picked":""}" data-j="${j}">${escapeHtml(o[0])}</button>`).join("");
+  const first = $("answers").querySelector("button"); if(first) first.focus({preventScroll:true});
+}
+function pickAnswer(j){
+  quiz.picks[quiz.i] = j;
+  if(quiz.i < QUESTIONS.length-1){ quiz.i++; renderQuestion(); }
+  else showQuizResult();
+}
+function userProfile(){
+  const tot = {}; AXES.forEach(([k])=>tot[k]=0);
+  quiz.picks.forEach((j,i)=>{ const d = QUESTIONS[i][1][j][1]; for(const k in d) tot[k]+=d[k]; });
+  const prof = {};
+  AXES.forEach(([k])=>{ const t=tot[k], r=RANGE[k]; prof[k] = Math.max(-2, Math.min(2, (t - r.mean) / r.sd * STRETCH)); });
+  return prof;
+}
+function rankPeople(prof){
+  return PEOPLE.map(([name,code,blurb])=>{
+    const v = code.split("").map(n=>+n-2);
+    const d = Math.sqrt(AXES.reduce((s,[k],i)=>s+(prof[k]-v[i])**2,0));
+    return {name, blurb, v, pct: Math.round(100*(1-d/MAXD))};
+  }).sort((a,b)=>b.pct-a.pct);
+}
+function showQuizResult(){
+  const prof = userProfile();
+  const ranked = rankPeople(prof);
+  const top = ranked[0];
+  quiz.top = top;
+  $("mName").textContent = top.name;
+  $("mBlurb").textContent = top.blurb;
+  $("mPct").textContent = `${top.pct}% match`;
+  $("keyName").textContent = top.name;
+  $("traits").innerHTML = AXES.map(([k,lo,hi],i)=>{
+    const you = (prof[k]+2)/4*100, them = (top.v[i]+2)/4*100;
+    return `<div class="trait"><div class="ends"><span>${lo}</span><span>${hi}</span></div>
+      <div class="track"><span class="dot them" style="left:${them}%"></span><span class="dot you" style="left:${you}%"></span></div></div>`;
+  }).join("");
+  $("closeList").innerHTML = ranked.slice(1,6).map(p=>`<li><div>${escapeHtml(p.name)}<small>${escapeHtml(p.blurb)}</small></div><span>${p.pct}%</span></li>`).join("");
+  $("qShareFlash").textContent = "";
+  show("qresult");
+}
+async function copyText(text, flashId){
+  let ok=false;
+  try{ await navigator.clipboard.writeText(text); ok=true; }
+  catch(e){ try{ const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select(); ok=document.execCommand("copy"); ta.remove(); }catch(e2){} }
+  $(flashId).textContent = ok ? "Copied. Paste it anywhere." : "Copy failed. Select the text above and copy it manually.";
+}
+
+$("answers").addEventListener("click", e=>{ const b=e.target.closest(".answer"); if(b) pickAnswer(+b.dataset.j); });
+$("qPrev").addEventListener("click", ()=>{ if(quiz.i>0){ quiz.i--; renderQuestion(); } });
+$("retakeBtn").addEventListener("click", startQuiz);
+$("qShareBtn").addEventListener("click", ()=>copyText(`Holocron Trivia says I’m ${quiz.top.name} (${quiz.top.pct}% match). ${quiz.top.blurb}`, "qShareFlash"));
+</script>
+</body></html>
